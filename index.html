@@ -42,7 +42,6 @@ function submitForm() {
   employee.email = document.getElementById("email").value;
   employee.role = document.getElementById("role").value;
 
-  // IMPORTANT: FormData (no JSON, no headers)
   const formData = new FormData();
   formData.append("name", employee.name);
   formData.append("email", employee.email);
@@ -65,13 +64,20 @@ function submitForm() {
 }
 
 /* ===============================
-   AI VOICE (TEXT TO SPEECH)
+   AI SPEAK (SAFE VERSION)
 ================================ */
-function speak(text) {
+function speak(text, callback) {
+  window.speechSynthesis.cancel(); // stop any previous speech
+
   const msg = new SpeechSynthesisUtterance(text);
   msg.lang = "en-IN";
-  msg.rate = 1;
+  msg.rate = 0.95;
   msg.pitch = 1;
+
+  msg.onend = function () {
+    if (callback) callback();
+  };
+
   window.speechSynthesis.speak(msg);
 }
 
@@ -81,26 +87,25 @@ function startAIVoice() {
   I am your virtual onboarding assistant.
   How are you feeling today?`;
 
-  speak(greeting);
-
-  // Start mic after AI finishes speaking
-  setTimeout(startListening, 6000);
+  speak(greeting, startListening);
 }
 
 /* ===============================
-   MIC LISTENING (SPEECH TO TEXT)
+   MIC LISTENING
 ================================ */
 function startListening() {
   recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
   recognition.lang = "en-IN";
   recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
 
   recognition.onresult = function(event) {
     const spokenText = event.results[0][0].transcript;
+
     document.getElementById("heardText").innerText =
       "You said: " + spokenText;
 
-    speak("Thank you. I heard you say " + spokenText);
+    speak("Thank you for sharing. I heard you say " + spokenText);
   };
 
   recognition.onerror = function() {
