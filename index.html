@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>AI Onboarding</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body>
+
+<!-- FORM SECTION -->
+<div id="formSection">
+  <h2>Welcome</h2>
+
+  <input id="name" placeholder="Your Name"><br><br>
+  <input id="email" placeholder="Email ID"><br><br>
+  <input id="role" placeholder="Role / Department"><br><br>
+
+  <button onclick="submitForm()">Start Onboarding</button>
+</div>
+
+<!-- AI SECTION -->
+<div id="aiSection" style="display:none;">
+  <h2>AI Onboarding Session</h2>
+  <p>Connecting to your AI trainer...</p>
+</div>
+
+<script>
+const BACKEND_URL = "https://script.google.com/macros/s/AKfycbwrdn0Kj8n9yzsdiS9xSsYYDzIsa4mkJ6WAg70xeXeKYVdCcHo6Fzc4GqOCCVwO48fRXg/exec";
+
+function submitForm() {
+  const name = document.getElementById("name").value;
+  const email = document.getElementById("email").value;
+  const role = document.getElementById("role").value;
+
+  fetch(BACKEND_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"   // ✅ IMPORTANT FIX
+    },
+    body: JSON.stringify({
+      name: name,
+      email: email,
+      role: role,
+      status: "Form Submitted"
+    })
+  })
+  .then(res => res.json())
+  .then(() => {
+    document.getElementById("formSection").style.display = "none";
+    document.getElementById("aiSection").style.display = "block";
+  })
+  .catch(err => {
+    alert("Backend error. Check console.");
+    console.error(err);
+  });
+}
+</script>
+
+</body>
+</html>
