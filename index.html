@@ -25,35 +25,28 @@
 </div>
 
 <script>
-const BACKEND_URL = "https://script.google.com/macros/s/AKfycbzY0CuQFdIBOopTEKOlWyjKlCIJ5N0v4ifoZiU_wpaKUOcuFgY5oUO0WvXy5L0FuQbP6A/exec";
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzY0CuQFdIBOopTEKOlWyjKlCIJ5N0v4ifoZiU_wpaKUOcuFgY5oUO0WvXy5L0FuQbP6A/exec";
 
-function submitForm() {
-  const name = document.getElementById("name").value;
-  const email = document.getElementById("email").value;
-  const role = document.getElementById("role").value;
+  function submitForm() {
+    const formData = new FormData();
 
-  fetch(BACKEND_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"   // ✅ IMPORTANT FIX
-    },
-    body: JSON.stringify({
-      name: name,
-      email: email,
-      role: role,
-      status: "Form Submitted"
+    formData.append("name", document.getElementById("name").value);
+    formData.append("email", document.getElementById("email").value);
+    formData.append("role", document.getElementById("role").value);
+    formData.append("status", "Started");
+
+    fetch(SCRIPT_URL, {
+      method: "POST",
+      body: formData
     })
-  })
-  .then(res => res.json())
-  .then(() => {
-    document.getElementById("formSection").style.display = "none";
-    document.getElementById("aiSection").style.display = "block";
-  })
-  .catch(err => {
-    alert("Backend error. Check console.");
-    console.error(err);
-  });
-}
+    .then(() => {
+      alert("Onboarding started successfully ✅");
+    })
+    .catch(err => {
+      alert("Error submitting form ❌");
+      console.error(err);
+    });
+  }
 </script>
 
 </body>
