@@ -22,36 +22,51 @@
 <div id="aiSection" style="display:none;">
   <h2>AI Onboarding Session</h2>
   <p>Connecting to your AI trainer...</p>
+  <p id="heardText" style="font-style:italic;"></p>
 </div>
 
 <script>
+/* ===============================
+   CONFIG
+================================ */
 const BACKEND_URL = "https://script.google.com/macros/s/AKfycbzY0CuQFdIBOopTEKOlWyjKlCIJ5N0v4ifoZiU_wpaKUOcuFgY5oUO0WvXy5L0FuQbP6A/exec";
 
 let employee = {};
+let recognition;
 
+/* ===============================
+   FORM SUBMIT
+================================ */
 function submitForm() {
   employee.name = document.getElementById("name").value;
   employee.email = document.getElementById("email").value;
   employee.role = document.getElementById("role").value;
 
+  // IMPORTANT: FormData (no JSON, no headers)
+  const formData = new FormData();
+  formData.append("name", employee.name);
+  formData.append("email", employee.email);
+  formData.append("role", employee.role);
+  formData.append("status", "Form Submitted");
+
   fetch(BACKEND_URL, {
     method: "POST",
-    body: JSON.stringify({
-      name: employee.name,
-      email: employee.email,
-      role: employee.role,
-      status: "Form Submitted"
-    })
-  }).then(() => {
+    body: formData
+  })
+  .then(() => {
     document.getElementById("formSection").style.display = "none";
     document.getElementById("aiSection").style.display = "block";
     startAIVoice();
+  })
+  .catch(err => {
+    alert("Backend error");
+    console.error(err);
   });
 }
 
-// ==========================
-// AI VOICE (TEXT TO SPEECH)
-// ==========================
+/* ===============================
+   AI VOICE (TEXT TO SPEECH)
+================================ */
 function speak(text) {
   const msg = new SpeechSynthesisUtterance(text);
   msg.lang = "en-IN";
@@ -61,12 +76,38 @@ function speak(text) {
 }
 
 function startAIVoice() {
-  const greeting = `Hello ${employee.name}. 
+  const greeting = `Hello ${employee.name}.
   Welcome to our company.
   I am your virtual onboarding assistant.
-  Let us begin your onboarding session.`;
+  How are you feeling today?`;
 
   speak(greeting);
+
+  // Start mic after AI finishes speaking
+  setTimeout(startListening, 6000);
+}
+
+/* ===============================
+   MIC LISTENING (SPEECH TO TEXT)
+================================ */
+function startListening() {
+  recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+  recognition.lang = "en-IN";
+  recognition.interimResults = false;
+
+  recognition.onresult = function(event) {
+    const spokenText = event.results[0][0].transcript;
+    document.getElementById("heardText").innerText =
+      "You said: " + spokenText;
+
+    speak("Thank you. I heard you say " + spokenText);
+  };
+
+  recognition.onerror = function() {
+    speak("Sorry, I could not hear you clearly. Please try again.");
+  };
+
+  recognition.start();
 }
 </script>
 
