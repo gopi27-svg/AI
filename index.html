@@ -4,29 +4,53 @@
   <title>AI Onboarding</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body { font-family: Arial; background:#f4f6f8; padding:20px; }
+    body {
+      font-family: Arial;
+      background:#f4f6f8;
+      padding:20px;
+    }
     .card {
-      max-width: 560px; margin:auto; background:#fff;
-      padding:25px; border-radius:10px;
+      max-width: 560px;
+      margin:auto;
+      background:#fff;
+      padding:25px;
+      border-radius:10px;
       box-shadow:0 4px 10px rgba(0,0,0,0.1);
     }
     input, button {
-      width:100%; padding:12px; margin-top:10px; font-size:16px;
+      width:100%;
+      padding:12px;
+      margin-top:10px;
+      font-size:16px;
     }
-    button { background:#007bff; color:#fff; border:none; border-radius:6px; }
-    button:disabled { background:#999; }
-    #aiText { margin-top:15px; font-style:italic; }
+    button {
+      background:#007bff;
+      color:#fff;
+      border:none;
+      border-radius:6px;
+      cursor:pointer;
+    }
+    button:disabled {
+      background:#999;
+    }
+    #aiText {
+      margin-top:15px;
+      font-style:italic;
+    }
   </style>
 </head>
 
 <body>
+
 <div class="card">
 
   <div id="formSection">
     <h2>Welcome to USDC</h2>
-    <input id="name" placeholder="Your Name">
-    <input id="email" placeholder="Email ID">
-    <input id="role" placeholder="Role / Department">
+
+    <input id="nameInput" placeholder="Your Name">
+    <input id="emailInput" placeholder="Email ID">
+    <input id="roleInput" placeholder="Role / Department">
+
     <button id="startBtn" onclick="startOnboarding()">Start Onboarding</button>
     <p id="status"></p>
   </div>
@@ -39,77 +63,76 @@
 </div>
 
 <script>
+/* 🔴 PASTE YOUR DEPLOYED WEB APP URL HERE */
 const BACKEND_URL = "https://script.google.com/macros/s/AKfycbzY0CuQFdIBOopTEKOlWyjKlCIJ5N0v4ifoZiU_wpaKUOcuFgY5oUO0WvXy5L0FuQbP6A/exec";
 
-let employeeName = "";
 let step = 0;
 let recognition;
 
-/* ================== ALL POLICIES SCRIPT ================== */
+/* ================== POLICIES ================== */
 const onboardingSteps = [
-
-"Welcome to USDC. I am your virtual onboarding assistant. You may ask questions at any time during this session.",
-
-"USDC is a global organization delivering professional services across multiple industries. We focus on quality, innovation, and long-term partnerships.",
-
-"Our vision is to build sustainable value for clients and employees. Our mission is to deliver excellence through integrity, collaboration, and continuous improvement.",
-
-"USDC has a global presence with teams serving clients across different regions and industries.",
-
-"At USDC, we promote a respectful and professional work culture. Teamwork, accountability, ethical conduct, and mutual respect are expected from all employees.",
-
-"Our regular working hours are as per company policy. Employees are expected to maintain punctuality and regular attendance.",
-
-"Attendance is mandatory. Any deviation or irregular attendance should be informed and approved by reporting managers.",
-
-"USDC provides various types of leave as per company policy. Leave requests should be applied in advance through the HR system.",
-
-"Employee benefits include insurance and other statutory benefits as applicable. Detailed benefit information will be shared by HR.",
-
-"All employees must complete mandatory onboarding and training programs. Continuous learning is encouraged at USDC.",
-
-"Employees will be under probation for the defined period. Performance reviews are conducted as per company guidelines.",
-
-"Salary structure includes applicable components and statutory deductions. Exact salary details are as per your offer letter and payslip.",
-
-"USDC uses HR systems to manage attendance, leave, and employee information. Employees are expected to use these systems responsibly.",
-
-"Employees are required to comply with company policies, sign necessary documents, and follow all statutory and internal guidelines.",
-
-"For any HR-related queries or support, employees may contact the HR team through official communication channels.",
-
-"This concludes your onboarding session. We welcome you to USDC and wish you a successful journey with us."
+  "USDC welcomes you. You are looking at the future of education.",
+  "United Skills Development Corporation is an ed-tech platform enabling universities to digitally educate learners globally.",
+  "Our vision is to bridge the skill gap and make education innovative, interactive, and accessible.",
+  "Our mission is to empower institutions during the fourth industrial revolution using advanced technologies.",
+  "USDC operates in over 52 countries with more than seventy thousand learners and seven hundred employees.",
+  "Our workplace culture promotes innovation, diversity, collaboration, transparency, and employee well-being.",
+  "Office attendance is five days a week with flexible shifts based on business requirements.",
+  "Leave policies include maternity, paternity, earned, sick, marriage, and bereavement leaves.",
+  "Employee benefits include insurance coverage, EPF, gratuity, wellness programs, and learning assistance.",
+  "Employees must complete LinkedIn certification within one month and post using hashtag USDC.",
+  "Probation period ranges from three to six months with performance evaluation.",
+  "All employees must comply with company policies, IT usage rules, and confidentiality agreements.",
+  "For any queries, employees can contact HR or the respective support teams.",
+  "This concludes your onboarding. Welcome to USDC and wish you success."
 ];
 
 /* ================== START ================== */
 function startOnboarding() {
-  employeeName = name.value;
-  if (!employeeName || !email.value || !role.value) {
-    alert("Please fill all details"); return;
+
+  const name = document.getElementById("nameInput").value.trim();
+  const email = document.getElementById("emailInput").value.trim();
+  const role = document.getElementById("roleInput").value.trim();
+
+  if (name === "" || email === "" || role === "") {
+    alert("Please fill all details");
+    return;
   }
 
-  startBtn.disabled = true;
-  status.innerText = "Starting onboarding…";
+  document.getElementById("startBtn").disabled = true;
+  document.getElementById("status").innerText = "Starting onboarding…";
 
   fetch(BACKEND_URL, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: `name=${employeeName}&email=${email.value}&role=${role.value}&status=Started`
-  }).then(() => {
-    formSection.style.display = "none";
-    aiSection.style.display = "block";
-    speak(`Hello ${employeeName}. How are you feeling today?`, true);
+    body: `name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}&role=${encodeURIComponent(role)}`
+  })
+  .then(() => {
+    document.getElementById("formSection").style.display = "none";
+    document.getElementById("aiSection").style.display = "block";
+    speak(`Hello ${name}. Welcome to USDC.`, true);
+  })
+  .catch(() => {
+    alert("Backend connection failed");
+    document.getElementById("startBtn").disabled = false;
   });
 }
 
 /* ================== SPEAK ================== */
 function speak(text, listenAfter=false) {
   const u = new SpeechSynthesisUtterance(text);
-  const v = speechSynthesis.getVoices();
-  u.voice = v.find(x => x.lang==="en-IN") || v[0];
-  u.rate = 0.85; u.pitch = 1; u.volume = 1;
-  aiText.innerText = text;
-  u.onend = () => listenAfter && setTimeout(startListening, 1500);
+  const voices = speechSynthesis.getVoices();
+  u.voice = voices.find(v => v.lang === "en-IN") || voices[0];
+  u.rate = 0.85;
+  u.pitch = 1;
+  u.volume = 1;
+
+  document.getElementById("aiText").innerText = text;
+
+  u.onend = () => {
+    if (listenAfter) setTimeout(startListening, 1200);
+  };
+
   speechSynthesis.speak(u);
 }
 
@@ -117,19 +140,21 @@ function speak(text, listenAfter=false) {
 function startListening() {
   recognition = new webkitSpeechRecognition();
   recognition.lang = "en-IN";
-  recognition.onstart = () => aiText.innerText = "Listening…";
-  recognition.onresult = () => setTimeout(nextStep, 1200);
-  recognition.onerror = nextStep;
+  recognition.onstart = () => {
+    document.getElementById("aiText").innerText = "Listening…";
+  };
+  recognition.onresult = () => nextStep();
+  recognition.onerror = () => nextStep();
   recognition.start();
 }
 
 /* ================== FLOW ================== */
 function nextStep() {
   if (step < onboardingSteps.length) {
-    speak(onboardingSteps[step] + " You may ask questions if you have any.", true);
+    speak(onboardingSteps[step], true);
     step++;
   } else {
-    speak("Onboarding is complete. Thank you.");
+    speak("Onboarding completed. Thank you.");
   }
 }
 </script>
