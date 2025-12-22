@@ -1,34 +1,49 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>USDC AI Onboarding</title>
+  <title>USDC Onboarding</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body { font-family: 'Segoe UI', Arial, sans-serif; background:#f4f6f8; padding:20px; display:flex; justify-content:center; align-items:center; min-height:100vh; margin:0; }
-    .card { width:100%; max-width: 500px; background:#fff; padding:30px; border-radius:12px; box-shadow:0 8px 20px rgba(0,0,0,0.1); text-align:center; position:relative; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; background:#f0f2f5; padding:20px; display:flex; justify-content:center; align-items:center; min-height:100vh; margin:0; }
+    .card { width:100%; max-width: 600px; background:#fff; padding:30px; border-radius:15px; box-shadow:0 10px 25px rgba(0,0,0,0.1); text-align:center; position:relative; }
     
-    h2 { color:#333; margin-bottom:15px; }
-    input, button { width:100%; padding:12px 15px; margin-top:12px; font-size:16px; border-radius:6px; border:1px solid #ddd; box-sizing:border-box; }
-    input:focus { border-color:#007bff; outline:none; }
+    h2 { color:#1a1a1a; margin-bottom:10px; }
+    p.subtitle { color:#666; font-size:14px; margin-bottom:20px; }
     
-    button { background:#007bff; color:#fff; border:none; cursor:pointer; font-weight:600; transition:0.3s; }
-    button:hover { background:#0056b3; }
-    button:disabled { background:#ccc; cursor:not-allowed; }
+    input, button { width:100%; padding:14px; margin-top:12px; font-size:16px; border-radius:8px; border:1px solid #ddd; box-sizing:border-box; }
+    input:focus { border-color:#007bff; outline:none; background:#f9fbff; }
     
-    #aiSection { margin-top:20px; display:none; }
-    #aiText { font-size:18px; color:#444; line-height:1.6; min-height:80px; font-style:italic; margin-top:15px; background: #f9f9f9; padding: 15px; border-radius: 8px; }
+    button { background:#007bff; color:#fff; border:none; cursor:pointer; font-weight:600; transition:0.3s; box-shadow: 0 4px 6px rgba(0,123,255,0.2); }
+    button:hover { background:#0056b3; transform:translateY(-1px); }
+    button:disabled { background:#ccc; cursor:not-allowed; box-shadow:none; }
     
-    /* Ask Button */
-    #askBtn { background:#ff9800; display:none; margin-top:20px; box-shadow: 0 4px 10px rgba(255, 152, 0, 0.3); }
-    #askBtn:hover { background:#e68900; }
-    #askBtn:active { transform: scale(0.98); }
+    /* AI Screen */
+    #aiSection { margin-top:0px; display:none; }
+    
+    /* Text Display Area */
+    #aiText { 
+      font-size:17px; color:#333; line-height:1.6; min-height:100px; 
+      margin-top:20px; background: #f8f9fa; padding: 20px; 
+      border-radius: 10px; border-left: 5px solid #007bff; text-align: left;
+    }
 
-    /* Animations */
-    .wave { height: 30px; display:none; justify-content:center; align-items:flex-end; gap:5px; margin-top:20px; }
-    .bar { width:6px; height:10px; background:#007bff; animation: bounce 0.5s infinite alternate; }
+    /* Progress Bar */
+    .progress-container { width: 100%; background-color: #e0e0e0; border-radius: 5px; margin-top: 20px; height: 6px; }
+    .progress-bar { height: 100%; background-color: #007bff; width: 0%; border-radius: 5px; transition: width 0.5s; }
+    #progressLabel { font-size: 12px; color: #888; margin-top: 5px; text-align: right; }
+
+    /* Ask Button */
+    #askBtn { background:#ff9800; display:none; margin-top:25px; box-shadow: 0 4px 10px rgba(255, 152, 0, 0.3); }
+    #askBtn:hover { background:#e68900; }
+
+    /* Voice Wave Animation */
+    .wave { height: 40px; display:none; justify-content:center; align-items:flex-end; gap:6px; margin-top:20px; margin-bottom: 10px;}
+    .bar { width:6px; height:15px; background:#007bff; animation: bounce 0.5s infinite alternate; border-radius: 3px; }
     .bar:nth-child(2) { animation-delay:0.1s; }
     .bar:nth-child(3) { animation-delay:0.2s; }
-    @keyframes bounce { to { height: 30px; opacity: 0.5; } }
+    .bar:nth-child(4) { animation-delay:0.3s; }
+    @keyframes bounce { to { height: 40px; opacity: 0.6; } }
+
   </style>
 </head>
 
@@ -38,21 +53,32 @@
   <!-- FORM -->
   <div id="formSection">
     <h2>Welcome to USDC</h2>
+    <p class="subtitle">Enter your details to begin the orientation</p>
     <input id="nameInput" placeholder="Full Name">
     <input id="emailInput" placeholder="Email Address">
     <input id="roleInput" placeholder="Role / Department">
-    <button onclick="startOnboarding()">Start Onboarding</button>
+    <button onclick="startOnboarding()">Start Session</button>
   </div>
 
-  <!-- AI -->
+  <!-- AI INTERFACE -->
   <div id="aiSection">
-    <h3>AI Assistant</h3>
-    <div class="wave" id="voiceWave">
-      <div class="bar"></div><div class="bar"></div><div class="bar"></div>
-    </div>
-    <div id="aiText">Connecting...</div>
+    <h2>AI Onboarding Assistant</h2>
     
-    <!-- INTERRUPT BUTTON -->
+    <!-- Progress -->
+    <div class="progress-container">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+    <div id="progressLabel">0% Completed</div>
+
+    <!-- Voice Visualizer -->
+    <div class="wave" id="voiceWave">
+      <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+    </div>
+
+    <!-- Live Text -->
+    <div id="aiText">Connecting to server...</div>
+    
+    <!-- Interrupt Button -->
     <button id="askBtn" onclick="askDoubt()">✋ Push to Ask Doubt</button>
   </div>
 </div>
@@ -78,15 +104,15 @@ function startOnboarding() {
   
   userInfo = { name, email, role };
 
-  // UI Updates
+  // UI Setup
   document.getElementById("formSection").style.display = "none";
   document.getElementById("aiSection").style.display = "block";
   document.getElementById("voiceWave").style.display = "flex";
   
-  // 1. Speak greeting immediately
-  speak(`Hello ${name}. Welcome to USDC. Retrieving your onboarding policy...`);
+  // 1. Immediate Greeting
+  speak(`Hello ${name}. Welcome to USDC. I will now guide you through our policies.`);
 
-  // 2. Fetch Summary Steps from Backend
+  // 2. Fetch Detailed Steps
   fetch(`${BACKEND_URL}?action=start&name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}&role=${encodeURIComponent(role)}`, { 
       method: "POST" 
   })
@@ -95,11 +121,12 @@ function startOnboarding() {
     if (data.success) {
       onboardingSteps = data.steps;
       document.getElementById("askBtn").style.display = "block"; 
-      setTimeout(nextStep, 1000); // Start reading steps
+      // Small delay before starting the list to finish the greeting
+      setTimeout(nextStep, 2000); 
     }
   })
   .catch(err => {
-    speak("Sorry, connection to server failed.");
+    speak("Sorry, I could not connect to the backend.");
   });
 }
 
@@ -108,40 +135,50 @@ function nextStep() {
   if (isPaused) return; 
 
   if (stepIndex < onboardingSteps.length) {
+    // Update Progress
+    let progress = Math.round(((stepIndex + 1) / onboardingSteps.length) * 100);
+    document.getElementById("progressBar").style.width = progress + "%";
+    document.getElementById("progressLabel").innerText = progress + "% Completed";
+
+    // Speak
     speak(onboardingSteps[stepIndex], true);
     stepIndex++;
   } else {
-    speak("Onboarding completed. Welcome to the team!");
+    speak("That covers all the policies. Welcome to the team!");
     document.getElementById("askBtn").style.display = "none";
     document.getElementById("voiceWave").style.display = "none";
+    document.getElementById("progressLabel").innerText = "Completed";
   }
 }
 
-/* ================== INTERRUPTION LOGIC ================== */
+/* ================== DOUBT INTERRUPTION ================== */
 function askDoubt() {
   isPaused = true;
-  synth.cancel(); // Stop talking
+  synth.cancel(); // Stop talking immediately
   
-  document.getElementById("aiText").innerText = "Listening... (Speak now)";
-  document.getElementById("askBtn").innerText = "Listening...";
-  document.getElementById("askBtn").disabled = true;
-  document.getElementById("voiceWave").style.opacity = "0.5";
+  const aiTextField = document.getElementById("aiText");
+  const askBtn = document.getElementById("askBtn");
+  
+  aiTextField.innerText = "Listening... (Please ask your question now)";
+  aiTextField.style.color = "#ff9800";
+  askBtn.innerText = "Listening...";
+  askBtn.disabled = true;
+  document.getElementById("voiceWave").style.opacity = "0.3";
 
   recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-  recognition.lang = "en-IN"; // Indian English
+  recognition.lang = "en-IN";
   
   recognition.onresult = (event) => {
     const question = event.results[0][0].transcript;
-    document.getElementById("aiText").innerText = "Searching Policy: " + question;
+    aiTextField.innerText = "Searching Policy for: " + question;
+    aiTextField.style.color = "#333";
     
-    // Send to Backend
     fetch(`${BACKEND_URL}?action=chat&question=${encodeURIComponent(question)}&name=${encodeURIComponent(userInfo.name)}`, { 
         method: "POST" 
     })
     .then(res => res.json())
     .then(data => {
-      // Speak Answer
-      speak(data.answer, false, true); 
+      speak(data.answer, false, true); // Speak answer, then resume
     })
     .catch(err => {
       speak("Sorry, I couldn't fetch an answer.", false, true);
@@ -155,36 +192,38 @@ function askDoubt() {
   recognition.start();
 }
 
-/* ================== SPEAK LOGIC ================== */
+/* ================== SPEECH LOGIC ================== */
 function speak(text, autoAdvance = false, resumeAfter = false) {
   if (synth.speaking) synth.cancel();
 
   const u = new SpeechSynthesisUtterance(text);
   const voices = synth.getVoices();
+  // Select Indian English voice
   u.voice = voices.find(v => v.lang === "en-IN") || voices[0];
-  u.rate = 0.95; // Natural speed
+  u.rate = 0.95; 
 
   document.getElementById("aiText").innerText = text;
 
   u.onend = () => {
     if (resumeAfter) {
+      // Resume Mode
       isPaused = false;
       document.getElementById("askBtn").innerText = "✋ Push to Ask Doubt";
       document.getElementById("askBtn").disabled = false;
       document.getElementById("voiceWave").style.opacity = "1";
+      document.getElementById("aiText").style.color = "#333";
       
-      // Resume flow
-      speak("Resuming onboarding...", true); 
+      speak("Resuming onboarding...", true);
     }
     else if (autoAdvance && !isPaused) {
-      setTimeout(nextStep, 1500); // Pause between steps
+      // Normal Mode
+      setTimeout(nextStep, 1200); // 1.2 second pause between paragraphs
     }
   };
 
   synth.speak(u);
 }
 
-// Pre-load voices
 window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
 
 </script>
